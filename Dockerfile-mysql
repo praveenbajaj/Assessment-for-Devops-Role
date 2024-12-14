@@ -1,0 +1,16 @@
+# Use the official MySQL image as the base
+FROM mysql:latest
+
+# Set environment variables for MySQL root password, database, and user
+ENV MYSQL_ROOT_PASSWORD=rootpassword
+ENV MYSQL_DATABASE=wordpress_db
+ENV MYSQL_USER=wp_user
+ENV MYSQL_PASSWORD=password
+
+# Expose the MySQL default port
+EXPOSE 3306
+
+# Comments explaining each step:
+# - Uses MySQL’s official image to ensure optimized performance and security.
+# - Environment variables are defined here but should be overridden with secure secrets in production.
+# - Port 3306 is exposed for database connectivity.

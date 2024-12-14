@@ -1,0 +1,39 @@
+name: WordPress CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - name: Log in to AWS ECR
+        run: |
+          aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin <your_aws_account_id>.dkr.ecr.us-west-2.amazonaws.com
+
+      - name: Build Docker images
+        run: |
+          docker build -t wordpress_app .
+          docker build -t mysql_app -f Dockerfile-mysql .
+
+      - name: Push Docker images to ECR
+        run: |
+          docker tag wordpress_app:latest <your_aws_account_id>.dkr.ecr.us-west-2.amazonaws.com/wordpress_app:latest
+          docker push <your_aws_account_id>.dkr.ecr.us-west-2.amazonaws.com/wordpress_app:latest
+
+      - name: Deploy to EC2 (Example - Adapt as per actual deployment setup)
+        run: |
+          ssh -i "your-key.pem" ec2-user@ec2-instance-public-ip << EOF
+            docker pull <your_aws_account_id>.dkr.ecr.us-west-2.amazonaws.com/wordpress_app:latest
+            docker run -d -p 80:80 wordpress_app
+          EOF
+
+# Comments:
+# - Ensures CI/CD setup via GitHub Actions for building, tagging, and pushing images.
+# - Securely logs into AWS ECR and deploys images to an EC2 instance.
